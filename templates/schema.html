@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Schema
+{% endblock %}
+
+{% block main %}
+    <h1>Database Schema</h1>
+    {% for table, columns in schemas.items() %}
+    <h2>{{ table }}</h2>
+    <ul>
+        {% for column in columns %}
+        <li>{{ column['name'] }} - {{ column['type'] }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    <h1>Registered Users</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>email</th>
+                <th>password</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.password }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

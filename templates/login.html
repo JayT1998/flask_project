@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log in
+{% endblock %}
+
+{% block main %}
+    <h1>Login</h1>
+    <div class="col-md-10 mx-auto col-lg-5">
+        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="/login" method="post">
+            <div class="form-floating mb-3">
+                <input 
+                    autocomplete="off" 
+                    autofocus name="username" 
+                    placeholder="Username" 
+                    type="text"
+                    class="form-control {% if errors.get('username') %}is-invalid{% endif %}">
+                <label for="username">Username</label>
+                {% if errors.get('username') %}
+                <div class="invalid-feedback">
+                {{ errors.get('username') }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-floating mb-3">
+                <input 
+                    name="password" 
+                    placeholder="Password" 
+                    type="password"
+                    id="password"
+                    class="form-control {% if errors.get('password') %}is-invalid{% endif %}">
+                <label for="password">Password</label>
+                {% if errors.get('password') %}
+                <div class="invalid-feedback">
+                {{ errors.get('password') }}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if errors.get('invalid') %}
+                <p class="text-danger">
+                    {{ errors.get('invalid') }}
+                </p>
+            {% endif %}
+
+            <button 
+                class="w-100 btn btn-lg btn-primary" 
+                type="submit">Log in
+            </button>
+        </form>
+    </div>
+    
+{% endblock %}

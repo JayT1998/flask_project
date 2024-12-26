@@ -1,0 +1,8 @@
+{% for image in images %}
+<div class="explore-section placeholder" data-src="{{ image.image_url }}">
+  <div class="explore-overlay">
+    <h1>{{ image.title }}</h1>
+    <p>{{ image.description }}</p>
+  </div>
+</div>
+{% endfor %}

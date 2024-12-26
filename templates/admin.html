@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Explore
+{% endblock %}
+
+{% block main %}
+    <h1>Admin</h1>
+
+    {% for table, columns in user_schema.items() %}
+    <h2>{{ table }}</h2>
+    <ul>
+        {% for column in columns %}
+        <li>{{ column['name'] }} - {{ column['type'] }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    <h1>Registered Users</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>email</th>
+                <th>password</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.password }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h1>Registered Games</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Image URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for image in images %}
+                <tr>
+                    <td>{{ image.id }}</td>
+                    <td>{{ image.title }}</td>
+                    <td>{{ image.description }}</td>
+                    <td>{{ image.image_url }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h1>Add new image data</h1>
+    <div class="col-md-10 mx-auto col-lg-10">
+        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="/admin" method="POST">
+
+            <label for="title">Title:</label>
+            <div class="form-floating mb-3">
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title"
+                    placeholder="Title"
+                    required>
+            </div>
+            
+            <label for="description">Description:</label>
+            <div class="form-floating mb-3">
+                <textarea
+                    id="description"
+                    name="description"
+                    required>
+                </textarea>
+            </div>
+            
+            <label for="image_url">Image URL:</label>
+            <div class="form-floating mb-3">
+                <input 
+                    type="text" 
+                    id="image_url" 
+                    name="image_url"
+                    placeholder="Image URL"
+                    required>
+            </div>
+    
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Add Image</button>
+        </form>
+        
+    </div>
+
+{% endblock %}

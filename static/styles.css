@@ -1,0 +1,88 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    /* overflow: hidden; */
+} 
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    display: block;
+}
+
+@media (min-width: 992px) {
+    .rounded-lg-3 { border-radius: .3rem; }
+}
+
+
+/* .explore-container{
+    overflow: hidden;
+    height: 100vh;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-align: start;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+.explore-container::-webkit-scrollbar {
+    display: none;
+}
+
+.nav{
+    height: 10;
+}
+
+
+.explore-section {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start;
+}
+
+.explore-overlay {
+    color: white;
+    text-shadow: 0px 0px 10px black;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+} */
+
+.explore-section {
+    width: 100%;
+    height: 50vh;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 1rem;
+  }
+  .placeholder {
+    background-image: url('/static/images/placeholder.png');
+  }
+  .explore-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+
+
+img.lazy {
+    filter: blur(10px); /* Add blur to low-res placeholder */
+    transition: filter 0.5s ease; /* Smooth transition */
+}
+
+img.lazy:not([src^="data:image"]) {
+    filter: none;
+}

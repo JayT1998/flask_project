@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <h1>Register</h1>
+    <div class="col-md-10 mx-auto col-lg-5">
+        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="/register" method="post">
+            <div class="form-floating mb-3">
+                <input 
+                    name="username" 
+                    placeholder="Username" 
+                    autocomplete="off" 
+                    type="text"
+                    class="form-control {% if errors.get('username') %}is-invalid{% endif %}">
+                <label for="username">Username</label>
+                {% if errors.get('username') %}
+                <div class="invalid-feedback">
+                    {{ errors.get('username') }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input 
+                    name="email" 
+                    placeholder="Email" 
+                    type="email"
+                    id="email"
+                    class="form-control {% if errors.get('email') %}is-invalid{% endif %}">
+                <label for="email">Email</label>
+                {% if errors.get('email') %}
+                <div class="invalid-feedback">
+                    {{ errors.get('email') }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input 
+                    name="password" 
+                    placeholder="Password" 
+                    type="password"
+                    id="password"
+                    class="form-control {% if errors.get('password') %}is-invalid{% endif %}">
+                <label for="password">Password</label>
+                {% if errors.get('password') %}
+                <div class="invalid-feedback">
+                    {{ errors.get('password') }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input name="confirmation" 
+                    placeholder="Confirm password" 
+                    type="password"
+                    id="confirmation"
+                    class="form-control {% if errors.get('confirmation') %}is-invalid{% endif %}">
+                <label for="confirmation">Confirm password</label>
+                {% if errors.get('confirmation') %}
+                <div class="invalid-feedback">
+                    {{ errors.get('confirmation') }}
+                </div>
+                {% endif %}
+            </div>
+    
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+            <hr class="my-4">
+            <small class="text-body-secondary">By clicking Sign up, you agree to the terms of use.</small>
+    
+        </form>
+    </div>
+{% endblock %}
