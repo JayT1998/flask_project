@@ -1,130 +1,124 @@
-# System operations
 import os
 from datetime import datetime
-
-# Flask
 from flask import Flask, redirect, render_template, request, jsonify
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
-# SQLalchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_sqlalchemy import SQLAlchemy
-
-# Security
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from werkzeug.security import check_password_hash, generate_password_hash
-
-# View schema
 from sqlalchemy import inspect
-from sqlalchemy.sql import func
 
-# json
-import json
-
+# ========================================================================================================== #
 
 app = Flask(__name__)
-
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "default_secret_key")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Intiate SQLAlchemy
 db = SQLAlchemy(app)
-
-# Intiate LoginManager. Being used in replacement of sessions
 login_manager = LoginManager(app)
-
-# Will redirect any unauthorised users who try to access a route 
-# decorated with @login_required to @app.route("/login")
 login_manager.login_view = "login"
 
-# Create User datebase tables
-# UserMixin supplies features such as is_authenticated and get_id()
+# ========================================================================================================== #
+
 class User(db.Model, UserMixin):
-    # __tablename defines the name of table when using SQLAlchemy
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    __tablename__ = 'users'
 
-    images = db.relationship('UserImage', back_populates='user')
+    id = db.Column(Integer, primary_key=True)
+    username = db.Column(String, unique=True, nullable=False)
+    email = db.Column(String, unique=True, nullable=False)
+    password = db.Column(String, nullable=False)
+    role = db.Column(String, nullable=False, default='user')
 
-class Image(db.Model):
-    __tablename__ = 'images'
-    id = db.Column(db.Integer, primary_key=True)
-    image_url = db.Column(db.String(255), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=True)
+    profile = db.relationship("Profile", uselist=False, back_populates="user")
 
-    images_for_users = db.relationship('UserImage', back_populates='image')
+class Profile(db.Model):
+    __tablename__ = 'profiles'
 
-# Linking table for users and images
-class UserImage(db.Model):
-    __tablename__ = 'user_images'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    image_id = db.Column(db.Integer, db.ForeignKey('images.id'))
+    id = db.Column(Integer, primary_key=True)
+    user_id = db.Column(Integer, ForeignKey('users.id'), nullable=False)
+    username = db.Column(String, nullable=False)
 
-    # Relationships back to the parent tables
-    user = db.relationship('User', back_populates='images')
-    image = db.relationship('Image', back_populates='images_for_users')
+    user = db.relationship("User", back_populates="profile")
+    games = db.relationship("Game", secondary='profile_games', back_populates="profiles")
 
-# JSON file based reading. Replaced with SQLAlchemy table.    
-# def load_images():
-#     with open("static/data/images.json", "r", encoding="utf-8") as file:
-#         return json.load(file)
+# Association table for many-to-many relationship between Profiles and Games
+game_genre_association = Table(
+    'game_genre_association', db.metadata,
+    Column('game_id', Integer, ForeignKey('games.id'), primary_key=True),
+    Column('genre_id', Integer, ForeignKey('genres.id'), primary_key=True)
+)
 
-# The following function load the users id from User. 
-# User.query.get(int(user_id)) is used to find the users id in User and stores the return in user_id
-# Updated from User.query.get(int(user_id)) to db.session.get(User, int(user_id)) to meet SQL standards
+# Association table for many-to-many relationship between Games and Developers
+game_developer_association = Table(
+    'game_developer_association', db.metadata,
+    Column('game_id', Integer, ForeignKey('games.id'), primary_key=True),
+    Column('developer_id', Integer, ForeignKey('developers.id'), primary_key=True)
+)
+
+# Association table for many-to-many relationship between Games and Platforms
+game_platform_association = Table(
+    'game_platform_association', db.metadata,
+    Column('game_id', Integer, ForeignKey('games.id'), primary_key=True),
+    Column('platform_id', Integer, ForeignKey('platforms.id'), primary_key=True)
+)
+
+class Game(db.Model):
+    __tablename__ = 'games'
+
+    id = db.Column(Integer, primary_key=True)
+    title = db.Column(String, nullable=False)
+    description = db.Column(String, nullable=False)
+    year = db.Column(Integer, nullable=False)
+
+    genres = db.relationship("Genre", secondary=game_genre_association, back_populates="games")
+    developers = db.relationship("Developer", secondary=game_developer_association, back_populates="games")
+    platforms = db.relationship("Platform", secondary=game_platform_association, back_populates="games")
+    profiles = db.relationship("Profile", secondary='profile_games', back_populates="games")
+
+class Genre(db.Model):
+    __tablename__ = 'genres'
+
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String, unique=True, nullable=False)
+    description = db.Column(String, nullable=True)
+
+    games = db.relationship("Game", secondary=game_genre_association, back_populates="genres")
+
+class Developer(db.Model):
+    __tablename__ = 'developers'
+
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String, unique=True, nullable=False)
+
+    games = db.relationship("Game", secondary=game_developer_association, back_populates="developers")
+
+class Platform(db.Model):
+    __tablename__ = 'platforms'
+
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String, unique=True, nullable=False)
+
+    games = db.relationship("Game", secondary=game_platform_association, back_populates="platforms")
+
+# Updated Profile Games Association
+profile_games = Table(
+    'profile_games', db.metadata,
+    Column('profile_id', Integer, ForeignKey('profiles.id'), primary_key=True),
+    Column('game_id', Integer, ForeignKey('games.id'), primary_key=True)
+)
+
+# ========================================================================================================== #
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-@app.route("/api/images_html")
-def get_images_html():
-    images = Image.query.order_by(func.random()).limit(1).all()
-    return render_template("partials/_image_cards.html", images=images)
-
-# Direction to main page or "index.html"
 @app.route("/")
 def explore():
-    images = Image.query.order_by(func.random()).limit(1).all()
-    return render_template("index.html", images=images)
-
+    return render_template("index.html")
 
 @app.route("/profile")
 def profile():
     return render_template("profile.html")
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-
-    errors = {}
-
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        if not username:
-            errors["username"] = "Username is required"
-        if not password:
-            errors["password"] = "Password is required"
-
-        # Query User for existing profile
-        if not errors:
-            user = User.query.filter_by(username=username).first()
-            if not user or not check_password_hash(user.password, password):
-                errors["invalid"] = "Invalid login"
-            
-        if errors:
-            return render_template("login.html", errors=errors)
-    
-        login_user(user)
-        return redirect("/")
-    
-    # Get method
-    return render_template("login.html", errors=errors)
- 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -165,7 +159,10 @@ def register():
             return render_template("register.html", errors=errors)
 
         hashed_password = generate_password_hash(password)
+        
         try:
+
+            # creates new user in users
             new_user = User(
                 username=username,
                 email=email,
@@ -173,7 +170,16 @@ def register():
             )
             db.session.add(new_user)
             db.session.commit()
+
+            # creates new profile in profile
+            new_profile = Profile(
+                user_id=new_user.id,
+                username=new_user.username
+            )
+            db.session.add(new_profile)
+            db.session.commit()
         except Exception as e:
+            db.session.rollback()
             errors["general"] = f"An unexpected error occurred: {e}"
             return render_template("register.html", errors=errors)
         
@@ -183,6 +189,34 @@ def register():
     # Get method return
     return render_template("register.html", errors=errors)
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    errors = {}
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if not username:
+            errors["username"] = "Username is required"
+        if not password:
+            errors["password"] = "Password is required"
+
+        # Query User for existing profile
+        if not errors:
+            user = User.query.filter_by(username=username).first()
+            if not user or not check_password_hash(user.password, password):
+                errors["invalid"] = "Invalid login"
+            
+        if errors:
+            return render_template("login.html", errors=errors)
+    
+        login_user(user)
+        return redirect("/")
+    
+    # Get method
+    return render_template("login.html", errors=errors)
 
 @app.route("/logout")
 @login_required
@@ -190,15 +224,6 @@ def logout():
     logout_user()
     return redirect("/login")
 
-@app.route("/schema", methods=["GET"])
-# @login_required
-def schema():
-    users = User.query.all() 
-    inspector = inspect(db.engine)
-    schemas = {}
-    for table_name in inspector.get_table_names():
-        schemas[table_name] = inspector.get_columns(table_name)
-    return render_template("schema.html", schemas=schemas, users=users)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -207,11 +232,14 @@ def admin():
         title = request.form.get("title")
         description = request.form.get("description")
         image_url = request.form.get("image_url")
+        genre = request.form.get("genre")
 
-        new_image = Image(
+        # ipload new data to images table
+        new_image = Game(
             title=title,
             description=description,
-            image_url=image_url
+            image_url=image_url,
+            genre=genre
         )
         db.session.add(new_image)
         db.session.commit()
@@ -220,14 +248,13 @@ def admin():
 
     # Get method render
     users = User.query.all()
-    images = Image.query.all()
+    images = Game.query.all()
     user_inspector = inspect(db.engine)
     user_schema = {}
     for i in user_inspector.get_table_names():
         user_schema[i] = user_inspector.get_columns(i)
 
     return render_template("admin.html", user_schema=user_schema, users=users, images=images)
-
 
 
 if __name__ == "__main__":

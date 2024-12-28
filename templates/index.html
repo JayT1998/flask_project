@@ -5,23 +5,28 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Explore</h1>
-    
-    <div id="explore-container">
-        {% for image in images %}
-          <div
-            class="explore-section placeholder"
-            data-src="{{ image.image_url }}"
-          >
-            <div class="explore-overlay">
-              <h2>{{ image.title }}</h2>
-              <p>{{ image.description }}</p>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    
-      <div id="sentinel"></div>
-    
+  <div class="welcome">
+    <p>Welcome, {{ current_user.username }}</p>
+  </div>
 
+  <!-- {% for genre in genres %}
+    <div class="genre-section">
+        <h2>{{ genre }}</h2>
+        <div class="carousel-container" data-genre="{{ genre }}">
+
+            <button class="prevBtn carousel-btn">Previous</button>
+
+
+            <div class="carousel-wrapper">
+
+            </div>
+
+
+            <button class="nextBtn carousel-btn">Next</button>
+        </div>
+
+        <div class="loadMoreSentinel" data-genre="{{ genre }}"></div>
+    </div>
+  {% endfor %} -->
+  
 {% endblock %}

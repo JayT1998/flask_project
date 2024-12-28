@@ -48,6 +48,7 @@
                 <th>Title</th>
                 <th>Description</th>
                 <th>Image URL</th>
+                <th>Genre</th>
             </tr>
         </thead>
         <tbody>
@@ -57,6 +58,7 @@
                     <td>{{ image.title }}</td>
                     <td>{{ image.description }}</td>
                     <td>{{ image.image_url }}</td>
+                    <td>{{ image.genre }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -93,6 +95,18 @@
                     name="image_url"
                     placeholder="Image URL"
                     required>
+            </div>
+
+            <label for="genre">Genre:</label>
+            <div class="form-floating mb-3">
+
+                <select name="genre" id="genre" required>
+                    <option value="" disabled selected>Select Genre</option>
+                    <option value="action-adventure-game">Action-adventure game</option>
+                    <option value="role-playing-video-game">Role-playing Video Game</option>
+                    <option value="Art">Platformer</option>
+                </select>
+   
             </div>
     
             <button class="w-100 btn btn-lg btn-primary" type="submit">Add Image</button>
