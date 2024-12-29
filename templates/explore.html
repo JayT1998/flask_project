@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Explore
+{% endblock %}
+
+{% block main %}
+    <div class="welcome">
+        <p>Welcome, {{ current_user.username }}</p>
+    </div>
+
+    {% for game in games %}
+    <div class="game-wrapper">
+        <div class="game-container">
+            <img src="{{ game.image_url or '/static/images/placeholder.png' }}">
+            <h2>{{ game.title }}</h2>
+                {% for developer in game.developers %}
+                    <h4>{{ developer.name }}</h4>
+                {% endfor %}
+            <h5>{{ game.year }}</h5>
+            <p>{{ game.description }}</p>
+        </div>
+    </div>
+
+    {% endfor %}
+{% endblock %}

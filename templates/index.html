@@ -1,32 +1,22 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Explore
+    landing Page
 {% endblock %}
 
 {% block main %}
-  <div class="welcome">
-    <p>Welcome, {{ current_user.username }}</p>
+<div class="center-wrapper">
+  <div class="landingPage">
+    <h1>Game ON</h1>
+    <p>
+      Game ON is a tool used to organise the games you love. Track games you are currently palying, 
+      games want to play and upcoming titles you're interested in.
+    </p>
+    <p>
+      <a class="btn btn-lg border-dark" href="/register">Join now</a>
+    </p>
   </div>
-
-  <!-- {% for genre in genres %}
-    <div class="genre-section">
-        <h2>{{ genre }}</h2>
-        <div class="carousel-container" data-genre="{{ genre }}">
-
-            <button class="prevBtn carousel-btn">Previous</button>
-
-
-            <div class="carousel-wrapper">
-
-            </div>
-
-
-            <button class="nextBtn carousel-btn">Next</button>
-        </div>
-
-        <div class="loadMoreSentinel" data-genre="{{ genre }}"></div>
-    </div>
-  {% endfor %} -->
+</div>
   
+
 {% endblock %}

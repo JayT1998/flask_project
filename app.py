@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, jsonify
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -68,6 +68,7 @@ class Game(db.Model):
     title = db.Column(String, nullable=False)
     description = db.Column(String, nullable=False)
     year = db.Column(Integer, nullable=False)
+    image_url = db.Column(String, nullable=True)
 
     genres = db.relationship("Genre", secondary=game_genre_association, back_populates="games")
     developers = db.relationship("Developer", secondary=game_developer_association, back_populates="games")
@@ -113,8 +114,13 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 @app.route("/")
-def explore():
+def landingPage():
     return render_template("index.html")
+
+@app.route("/explore")
+def explore():
+    games = Game.query.all()
+    return render_template("explore.html", games=games)
 
 @app.route("/profile")
 def profile():
@@ -184,7 +190,7 @@ def register():
             return render_template("register.html", errors=errors)
         
         login_user(new_user)
-        return redirect("/")
+        return redirect("/explore")
     
     # Get method return
     return render_template("register.html", errors=errors)
@@ -213,7 +219,7 @@ def login():
             return render_template("login.html", errors=errors)
     
         login_user(user)
-        return redirect("/")
+        return redirect("/explore")
     
     # Get method
     return render_template("login.html", errors=errors)
@@ -222,29 +228,10 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect("/login")
-
+    return redirect("/")
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
-    if request.method == "POST":
-        # Get form data
-        title = request.form.get("title")
-        description = request.form.get("description")
-        image_url = request.form.get("image_url")
-        genre = request.form.get("genre")
-
-        # ipload new data to images table
-        new_image = Game(
-            title=title,
-            description=description,
-            image_url=image_url,
-            genre=genre
-        )
-        db.session.add(new_image)
-        db.session.commit()
-
-        return redirect("/admin")
 
     # Get method render
     users = User.query.all()
